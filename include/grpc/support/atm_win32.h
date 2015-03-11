@@ -60,7 +60,7 @@ static __inline int gpr_atm_no_barrier_cas(gpr_atm *p, gpr_atm o, gpr_atm n) {
 #ifdef GPR_ARCH_64
   return o == (gpr_atm)InterlockedCompareExchangeAcquire64(p, n, o);
 #else
-  return o == (gpr_atm)InterlockedCompareExchangeAcquire(p, n, o);
+  return o == (gpr_atm)InterlockedCompareExchangeAcquire((long volatile *)p, n, o);
 #endif
 }
 
@@ -68,7 +68,7 @@ static __inline int gpr_atm_acq_cas(gpr_atm *p, gpr_atm o, gpr_atm n) {
 #ifdef GPR_ARCH_64
   return o == (gpr_atm)InterlockedCompareExchangeAcquire64(p, n, o);
 #else
-  return o == (gpr_atm)InterlockedCompareExchangeAcquire(p, n, o);
+  return o == (gpr_atm)InterlockedCompareExchangeAcquire((long volatile *)p, n, o);
 #endif
 }
 
@@ -76,7 +76,7 @@ static __inline int gpr_atm_rel_cas(gpr_atm *p, gpr_atm o, gpr_atm n) {
 #ifdef GPR_ARCH_64
   return o == (gpr_atm)InterlockedCompareExchangeRelease64(p, n, o);
 #else
-  return o == (gpr_atm)InterlockedCompareExchangeRelease(p, n, o);
+  return o == (gpr_atm)InterlockedCompareExchangeRelease((long volatile *)p, n, o);
 #endif
 }
 
@@ -100,7 +100,7 @@ static __inline gpr_atm gpr_atm_full_fetch_add(gpr_atm *p, gpr_atm delta) {
 #else
   do {
     old = *p;
-  } while (old != (gpr_atm)InterlockedCompareExchange(p, old + delta, old));
+  } while (old != (gpr_atm)InterlockedCompareExchange((long volatile *)p, old + delta, old));
 #endif
   return old;
 }
